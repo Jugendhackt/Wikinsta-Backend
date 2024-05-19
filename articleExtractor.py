@@ -89,5 +89,3 @@ def getArtist(imgURL, language_code='en'):
     jsonResponse = response.json()
 
     return jsonResponse['query']['pages']['-1']['imageinfo'][0]['extmetadata']['Artist']['value']
-
-print(searchArticles('sun', 'en'))
