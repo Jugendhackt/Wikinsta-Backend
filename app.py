@@ -8,7 +8,7 @@ import thefuzz.fuzz as fuzz
 from articleExtractor import searchArticles
 
 IP = "0.0.0.0"
-PORT = 80
+PORT = 5000
 
 
 app = Flask(__name__)
