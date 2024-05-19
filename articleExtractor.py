@@ -70,10 +70,9 @@ def getLicense(imgURL, language_code='en'):
     response = requests.get(url)
     jsonResponse = response.json()
 
-    if jsonResponse['query']['pages']['-1']['imageinfo'][0]['extmetadata']['LicenseShortName']['value'] == 'CC BY-SA 4.0':
-        return 'CC BY-SA 4.0'
-    else:
-        return 'noLicense'
+    shortLicense = jsonResponse['query']['pages']['-1']['imageinfo'][0]['extmetadata']['LicenseShortName']['value']
+
+    return shortLicense
 
 def getArtist(imgURL, language_code='en'):
     imgName = imgURL.split('/')[-1]
