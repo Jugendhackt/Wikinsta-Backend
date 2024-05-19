@@ -30,6 +30,7 @@ def searchArticles(search_query='Never gonna give you up', language_code='en'):
         if 'missing' not in value:
             articles.append({
                 'lang': language_code,
+                'category': 'other',
                 'title': value['title'],
                 'id': id,
                 'summary': value['extract'],
@@ -55,7 +56,7 @@ def getImage(search_query='Never gonna give you up', language_code='en'):
 
     img = imgs[0]
     if img != 'noimg':
-        if getLicense(img, language_code) == 'CC BY-SA 4.0':
+        if getLicense(img, language_code).startswith("CC"):
             return {'img': img, 'license': getLicense(img, language_code), 'artist': getArtist(img, language_code)}
 
     return None
@@ -69,10 +70,11 @@ def getLicense(imgURL, language_code='en'):
     response = requests.get(url)
     jsonResponse = response.json()
 
-    if jsonResponse['query']['pages']['-1']['imageinfo'][0]['extmetadata']['LicenseShortName']['value'] == 'CC BY-SA 4.0':
-        return 'CC BY-SA 4.0'
-    else:
-        return 'noLicense'
+    shortLicense = jsonResponse['query']['pages']['-1']['imageinfo'][0]['extmetadata']['LicenseShortName']['value']
+
+    return shortLicense
+
+# Returns the Artist of the given Image
 
 def getArtist(imgURL, language_code='en'):
     imgName = imgURL.split('/')[-1]
