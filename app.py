@@ -22,11 +22,17 @@ data: dict = json.load(open("data.json", "r"))
 
 # Returns a list which is ordered by similarity to a string
 def search_string_list(strings: list[str], match: str) -> list[str]:
-    return [art for art, _ in sorted([(a, textdistance.hamming.normalized_similarity(a, match)) for a in strings], key=lambda x: (-x[1], x[0]))]
+    print([(a, textdistance.hamming.normalized_similarity(a, match)) for a in strings])
+    return [
+        art for art, sim in
+        sorted
+        ([(a, textdistance.hamming.normalized_similarity(a, match)) for a in strings],key=lambda x: (-x[1], x[0]))
+        if sim > 0
+    ]
     #return [art for art, _ in sorted([(a, fuzz.ratio(a, match)) for a in strings], key=lambda x: (-x[1], x[0]))]
     #return difflib.get_close_matches(match,strings)
 
-print()
+print("sims",search_string_list(["Holz","Baum","Wasser"],"elon musk"))
 
 # Adds an article to the db
 def add_article(art: dict):
@@ -37,11 +43,14 @@ def add_article(art: dict):
 
 
 # Searches articles
-@app.route("/search/<art>")
-def search(art: str):
+@app.route("/search/<title>")
+def search(title: str):
     global data
     artis = list(data.values())
-    return search_string_list(artis,art)
+    s = search_string_list([art["title"] for art in artis],title)
+    if s == []:
+        s = [search_wikipedia(title)]
+    return s
 
 
 # Gets a list of randomized articles from the db
@@ -58,9 +67,8 @@ def all_artis(amount: str):
 # Gets an article with a certain title from the db
 # If none are available, it makes one
 @app.route('/create_title/<title>')
-def get(title: str):
-    search_wikipedia(title)
-    return get(title)
+def create_title(title: str):
+    return search_wikipedia(title)
 
 
 # Gets an article vie UUID from the db
@@ -78,6 +86,8 @@ def get_id(uuid: str):
 def search_wikipedia(name: str):
     global data
     response = searchArticles(name, "de")
+    if len(response) == 0:
+        return {}
     art = response[0]
     not_found = True
     for art2 in data.values():
