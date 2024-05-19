@@ -22,7 +22,7 @@ data: dict = json.load(open("data.json", "r"))
 
 # Returns a list which is ordered by similarity to a string
 def search_string_list(strings: list[str], match: str) -> list[str]:
-    return textdistance.hamming('test', 'text')
+    return [art for art, _ in sorted([(a, textdistance.hamming.normalized_similarity(a, match)) for a in strings], key=lambda x: (-x[1], x[0]))]
     #return [art for art, _ in sorted([(a, fuzz.ratio(a, match)) for a in strings], key=lambda x: (-x[1], x[0]))]
     #return difflib.get_close_matches(match,strings)
 
