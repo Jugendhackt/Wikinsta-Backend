@@ -27,6 +27,8 @@ def searchArticles(search_query='Never gonna give you up', language_code='en'):
     for id, value in jsonResponse['query']['pages'].items():
         img = getImage(value['title'], language_code)
 
+        print(value)
+
         if 'missing' not in value:
             articles.append({
                 'lang': language_code,
@@ -67,7 +69,7 @@ def getImage(search_query='Never gonna give you up', language_code='en'):
         if getLicense(img, language_code) == 'CC BY-SA 4.0':
             return {'img': img, 'license': getLicense(img, language_code), 'artist': getArtist(img, language_code)}
 
-    return 'none'
+    return None
 
 # Returns the License Short form of an image
 
@@ -77,6 +79,8 @@ def getLicense(imgURL, language_code='en'):
     url = f'https://{language_code}.wikipedia.org/w/api.php?action=query&prop=imageinfo&iiprop=extmetadata&format=json&titles=File%3a{imgName}'
     response = requests.get(url)
     jsonResponse = response.json()
+
+    print(jsonResponse)
 
     if jsonResponse['query']['pages']['-1']['imageinfo'][0]['extmetadata']['LicenseShortName']['value'] == 'CC BY-SA 4.0':
         return 'CC BY-SA 4.0'
