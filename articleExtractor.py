@@ -38,15 +38,6 @@ def searchArticles(search_query='Never gonna give you up', language_code='en'):
                 'picture': img
             })
 
-        articles.append({
-            'category': 'other',
-            'lang': language_code,
-            'title': value['title'],
-            'id': id,
-            'summary': 'Nothing found',
-            'picture': img
-        })
-
     return articles
 
 # Returns an Image in form of {'img': <the picture link>, 'license': <the license>}
