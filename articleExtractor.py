@@ -3,6 +3,7 @@ import requests
 
 # Article Format:
 # {
+#  'category': <category>,
 #  'lang': <language_code>,
 #  'title': <title>
 #  'id': <ID of the Wikipedia Article>
