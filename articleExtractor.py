@@ -69,8 +69,6 @@ def getLicense(imgURL, language_code='en'):
     response = requests.get(url)
     jsonResponse = response.json()
 
-    print(jsonResponse)
-
     if jsonResponse['query']['pages']['-1']['imageinfo'][0]['extmetadata']['LicenseShortName']['value'] == 'CC BY-SA 4.0':
         return 'CC BY-SA 4.0'
     else:
