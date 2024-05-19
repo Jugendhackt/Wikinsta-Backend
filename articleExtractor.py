@@ -55,7 +55,7 @@ def getImage(search_query='Never gonna give you up', language_code='en'):
 
     img = imgs[0]
     if img != 'noimg':
-        if getLicense(img, language_code).startswith("CC BY-SA"):
+        if getLicense(img, language_code).startswith("CC"):
             return {'img': img, 'license': getLicense(img, language_code), 'artist': getArtist(img, language_code)}
 
     return None
