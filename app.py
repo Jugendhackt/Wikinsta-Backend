@@ -2,7 +2,6 @@ import difflib
 import random
 from flask import Flask
 import json
-main_thread_running = True
 import thefuzz.fuzz as fuzz
 from articleExtractor import searchArticles
 
@@ -10,8 +9,8 @@ app = Flask(__name__)
 data: dict = json.load(open("data.json", "r"))
 
 def search_string_list(strings: list[str], match: str) -> list[str]:
-    # return [art for art, _ in sorted([(a, fuzz.ratio(a, match)) for a in strings], key=lambda x: (-x[1], x[0]))]
-    return difflib.get_close_matches(match,strings)
+    return [art for art, _ in sorted([(a, fuzz.ratio(a, match)) for a in strings], key=lambda x: (-x[1], x[0]))]
+    #return difflib.get_close_matches(match,strings)
 
 @app.route("/search/<art>")
 def search(art):
@@ -40,7 +39,7 @@ def get(art):
 
 def search_wikipedia(art: str):
     global data
-    response = searchArticles(art,"en")
+    response = searchArticles(art,"de")
     arti = response[0]
     title = arti["title"]
 
