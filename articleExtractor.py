@@ -27,8 +27,6 @@ def searchArticles(search_query='Never gonna give you up', language_code='en'):
     for id, value in jsonResponse['query']['pages'].items():
         img = getImage(value['title'], language_code)
 
-        print(value)
-
         if 'missing' not in value:
             articles.append({
                 'lang': language_code,
