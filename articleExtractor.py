@@ -30,6 +30,7 @@ def searchArticles(search_query='Never gonna give you up', language_code='en'):
         if 'missing' not in value:
             articles.append({
                 'lang': language_code,
+                'category': 'other',
                 'title': value['title'],
                 'id': id,
                 'summary': value['extract'],
