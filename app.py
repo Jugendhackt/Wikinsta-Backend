@@ -44,24 +44,16 @@ def all_artis(amount: str):
     if not amount.isdigit():
         return Response(status="400")
     artis = list(data.values())
-    print(artis)
 
     return random.choices(artis, k=int(amount))
 
 
 # Gets an article with a certain title from the db
 # If none are available, it makes one
-@app.route('/by_title/<title>')
+@app.route('/create_title/<title>')
 def get(title: str):
-    info = {}
-    for art in data.values():
-        if art["title"] == title:
-            info = art
-    if info != {}:
-        return info
-    else:
-        search_wikipedia(title)
-        return get(title)
+    search_wikipedia(title)
+    return get(title)
 
 
 # Gets an article vie UUID from the db
@@ -81,9 +73,11 @@ def search_wikipedia(name: str):
     response = searchArticles(name, "de")
     art = response[0]
     not_found = True
+    print("resp",response)
     for art2 in data.values():
         if art["title"] == art2["title"]:
             not_found = False
+    print("resp",response)
     if not_found:
         add_article(art)
     return art
