@@ -3,7 +3,7 @@ import requests
 
 # Function to get some informations about a Wikipedia article.
 
-def searchArticles(language_code='en', search_query='Never gonna give you up'):
+def searchArticles(search_query='Never gonna give you up', language_code='en'):
     url = f'https://{language_code}.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles={search_query}'
     response = requests.get(url)
     jsonResponse = response.json()
@@ -12,7 +12,7 @@ def searchArticles(language_code='en', search_query='Never gonna give you up'):
 
     for id, value in jsonResponse['query']['pages'].items():
 
-        img = getImage(language_code, value['title'])
+        img = getImage(value['title'], language_code)
 
         articles.append({
             'lang': language_code,
@@ -24,7 +24,9 @@ def searchArticles(language_code='en', search_query='Never gonna give you up'):
 
     return articles
 
-def getImage(language_code='en', search_query='Never gonna give you up'):
+# Returns an Image in form of {'img': <the picture link>, 'license': <the license>}
+
+def getImage(search_query='Never gonna give you up', language_code='en'):
     url = f'https://{language_code}.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles={search_query}'
     response = requests.get(url)
     jsonResponse = response.json()
@@ -44,6 +46,8 @@ def getImage(language_code='en', search_query='Never gonna give you up'):
 
     return {'img': 'noimg', 'license': 'noimg'}
 
+# Returns the License Short form of an image
+
 def getLicense(imgURL, language_code='en'):
 
     # query > pages > -1 > imginfo > 0 > extmetadata > LicenseShortName > value
@@ -58,5 +62,3 @@ def getLicense(imgURL, language_code='en'):
         return 'CC BY-SA 4.0'
     else:
         return 'noLicense'
-
-print(searchArticles(search_query='sun'))
