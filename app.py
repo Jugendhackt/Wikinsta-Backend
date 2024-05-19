@@ -27,7 +27,7 @@ def search(art):
     return search_string_list(artis,art)
 
 
-@app.route("/all/<amount>")
+@app.route("/random/<amount>")
 def all_artis(amount:int):
     global data
     artis = list(data.keys())
