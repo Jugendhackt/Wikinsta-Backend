@@ -28,10 +28,12 @@ def search(art):
 
 
 @app.route("/random/<amount>")
-def all_artis(amount:int):
+def all_artis(amount: str):
     global data
+    if not amount.isdigit():
+        return "Kann nicht mit non-integers gecallt werden"
     artis = list(data.keys())
-    return list(set(random.choices(artis,k=amount)))
+    return list(set(random.choices(artis,k=int(amount))))
 
 
 @app.route('/by_title/<title>')
