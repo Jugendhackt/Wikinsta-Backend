@@ -36,6 +36,7 @@ def searchArticles(search_query='Never gonna give you up', language_code='en'):
             })
 
         articles.append({
+            'category': 'other',
             'lang': language_code,
             'title': value['title'],
             'id': id,
