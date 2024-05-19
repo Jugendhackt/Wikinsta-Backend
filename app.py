@@ -2,24 +2,31 @@ import difflib
 import random
 import uuid
 
+import textdistance
 from flask import Flask, Response
+from flask_cors import CORS, cross_origin
 import json
 import thefuzz.fuzz as fuzz
 from articleExtractor import searchArticles
+import textdistance as td
 
 IP = "0.0.0.0"
 PORT = 5000
 
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 data: dict = json.load(open("data.json", "r"))
 
 
 # Returns a list which is ordered by similarity to a string
 def search_string_list(strings: list[str], match: str) -> list[str]:
-    return [art for art, _ in sorted([(a, fuzz.ratio(a, match)) for a in strings], key=lambda x: (-x[1], x[0]))]
+    return textdistance.hamming('test', 'text')
+    #return [art for art, _ in sorted([(a, fuzz.ratio(a, match)) for a in strings], key=lambda x: (-x[1], x[0]))]
     #return difflib.get_close_matches(match,strings)
 
+print()
 
 # Adds an article to the db
 def add_article(art: dict):
