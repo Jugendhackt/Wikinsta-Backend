@@ -1,54 +1,93 @@
 import difflib
 import random
-from flask import Flask
+import uuid
+
+from flask import Flask, Response
 import json
-main_thread_running = True
 import thefuzz.fuzz as fuzz
 from articleExtractor import searchArticles
+
+IP = "0.0.0.0"
+PORT = 5000
+
 
 app = Flask(__name__)
 data: dict = json.load(open("data.json", "r"))
 
-def search_string_list(strings: list[str], match: str) -> list[str]:
-    # return [art for art, _ in sorted([(a, fuzz.ratio(a, match)) for a in strings], key=lambda x: (-x[1], x[0]))]
-    return difflib.get_close_matches(match,strings)
 
-@app.route("/search/<art>")
-def search(art):
+# Returns a list which is ordered by similarity to a string
+def search_string_list(strings: list[str], match: str) -> list[str]:
+    return [art for art, _ in sorted([(a, fuzz.ratio(a, match)) for a in strings], key=lambda x: (-x[1], x[0]))]
+    #return difflib.get_close_matches(match,strings)
+
+
+# Adds an article to the db
+def add_article(art: dict):
     global data
-    artis = data.keys()
-    print(sorted([(a, fuzz.ratio(a,art)) for a in artis], key=lambda x: (-x[1], x[0])))
+    art.update({"uuid":str(uuid.uuid4())})
+    data.update({str(uuid.uuid4()):art})
+    json.dump(data,open("data.json","w"))
+
+
+# Searches articles
+@app.route("/search/<art>")
+def search(art: str):
+    global data
+    artis = list(data.values())
     return search_string_list(artis,art)
 
 
-@app.route("/all/<amount>")
-def all_artis(amount:int):
+# Gets a list of randomized articles from the db
+@app.route("/random/<amount>")
+def all_artis(amount: str):
     global data
-    artis = list(data.keys())
-    return list(set(random.choices(artis,k=amount)))
+    if not amount.isdigit():
+        return Response(status="400")
+    artis = list(data.values())
+    print(artis)
+
+    return random.choices(artis, k=int(amount))
 
 
-@app.route('/arti/<art>')
-def get(art):
-    info = data.get(art)
-    if info != None:
-        return data.get(art)
+# Gets an article with a certain title from the db
+# If none are available, it makes one
+@app.route('/by_title/<title>')
+def get(title: str):
+    info = {}
+    for art in data.values():
+        if art["title"] == title:
+            info = art
+    if info != {}:
+        return info
     else:
-        search_wikipedia(art)
-        return get(art)
+        search_wikipedia(title)
+        return get(title)
 
 
-def search_wikipedia(art: str):
+# Gets an article vie UUID from the db
+@app.route("/by_uuid/<uuid>")
+def get_id(uuid: str):
+    art = data.get(uuid)
+    if art != None:
+        return art
+    else:
+        return Response(status="404")
+
+
+# Searches wikipedia for an article,
+# which it then puts into the db
+def search_wikipedia(name: str):
     global data
-    response = searchArticles(art,"en")
-    arti = response[0]
-    title = arti["title"]
-
-    if data.get(title) == None:
-        data.update({title:arti})
-    json.dump(data,open("data.json","w"))
-    return arti["summary"]
+    response = searchArticles(name, "de")
+    art = response[0]
+    not_found = True
+    for art2 in data.values():
+        if art["title"] == art2["title"]:
+            not_found = False
+    if not_found:
+        add_article(art)
+    return art
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host=IP, port=PORT)
