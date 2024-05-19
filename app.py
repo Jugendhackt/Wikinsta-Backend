@@ -48,8 +48,6 @@ def search(title: str):
     global data
     artis = list(data.values())
     s = search_string_list([art["title"] for art in artis],title)
-    if s == []:
-        s = [search_wikipedia(title)]
     return s
 
 
