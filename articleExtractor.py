@@ -74,6 +74,8 @@ def getLicense(imgURL, language_code='en'):
 
     return shortLicense
 
+# Returns the Artist of the given Image
+
 def getArtist(imgURL, language_code='en'):
     imgName = imgURL.split('/')[-1]
 
