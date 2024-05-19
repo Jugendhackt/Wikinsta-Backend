@@ -41,8 +41,7 @@ def get(art):
 
 def search_wikipedia(art: str):
     global data
-    #FIXME: WIKIPEDIA
-    response = searchArticles("de", art)
+    response = searchArticles(art,"de")
     arti = response[0]
     title = arti["title"]
     print(data)
