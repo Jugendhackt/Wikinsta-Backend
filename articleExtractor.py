@@ -1,6 +1,20 @@
 # Import the lib for Web-Requests
 import requests
 
+# Article Format:
+# {
+#  'category': <category>,
+#  'lang': <language_code>,
+#  'title': <title>
+#  'id': <ID of the Wikipedia Article>
+#  'summary': <A "small" summary>,
+#  'picture': <none | {
+#   'img': <link>,
+#   'license': <license>,
+#   'artist': <artist>
+#  }>
+# }
+
 # Function to get some informations about a Wikipedia article.
 
 def searchArticles(search_query='Never gonna give you up', language_code='en'):
@@ -11,14 +25,23 @@ def searchArticles(search_query='Never gonna give you up', language_code='en'):
     articles = []
 
     for id, value in jsonResponse['query']['pages'].items():
-
         img = getImage(value['title'], language_code)
 
+        if 'missing' not in value:
+            articles.append({
+                'lang': language_code,
+                'title': value['title'],
+                'id': id,
+                'summary': value['extract'],
+                'picture': img
+            })
+
         articles.append({
+            'category': 'other',
             'lang': language_code,
             'title': value['title'],
             'id': id,
-            'summary': value['extract'],
+            'summary': 'Nothing found',
             'picture': img
         })
 
@@ -42,16 +65,13 @@ def getImage(search_query='Never gonna give you up', language_code='en'):
     img = imgs[0]
     if img != 'noimg':
         if getLicense(img, language_code) == 'CC BY-SA 4.0':
-            return {'img': img, 'license': getLicense(img, language_code)}
+            return {'img': img, 'license': getLicense(img, language_code), 'artist': getArtist(img, language_code)}
 
-    return {'img': 'noimg', 'license': 'noimg'}
+    return 'none'
 
 # Returns the License Short form of an image
 
 def getLicense(imgURL, language_code='en'):
-
-    # query > pages > -1 > imginfo > 0 > extmetadata > LicenseShortName > value
-
     imgName = imgURL.split('/')[-1]
 
     url = f'https://{language_code}.wikipedia.org/w/api.php?action=query&prop=imageinfo&iiprop=extmetadata&format=json&titles=File%3a{imgName}'
@@ -62,3 +82,12 @@ def getLicense(imgURL, language_code='en'):
         return 'CC BY-SA 4.0'
     else:
         return 'noLicense'
+
+def getArtist(imgURL, language_code='en'):
+    imgName = imgURL.split('/')[-1]
+
+    url = f'https://{language_code}.wikipedia.org/w/api.php?action=query&prop=imageinfo&iiprop=extmetadata&format=json&titles=File%3a{imgName}'
+    response = requests.get(url)
+    jsonResponse = response.json()
+
+    return jsonResponse['query']['pages']['-1']['imageinfo'][0]['extmetadata']['Artist']['value']
