@@ -33,7 +33,7 @@ def add_article(art: dict):
 @app.route("/search/<art>")
 def search(art: str):
     global data
-    artis = list(data.keys())
+    artis = list(data.values())
     return search_string_list(artis,art)
 
 
@@ -44,7 +44,9 @@ def all_artis(amount: str):
     if not amount.isdigit():
         return Response(status="400")
     artis = list(data.values())
-    return list(set(random.choices(artis,k=int(amount))))
+    print(artis)
+
+    return random.choices(artis, k=int(amount))
 
 
 # Gets an article with a certain title from the db
