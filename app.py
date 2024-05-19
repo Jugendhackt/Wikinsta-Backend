@@ -20,7 +20,7 @@ def add_article(art: dict):
     data.update({str(uuid.uuid4()):art})
     json.dump(data,open("data.json","w"))
 @app.route("/search/<art>")
-def search(art):
+def search(art: str):
     global data
     artis = data.keys()
     print(sorted([(a, fuzz.ratio(a,art)) for a in artis], key=lambda x: (-x[1], x[0])))
@@ -37,7 +37,7 @@ def all_artis(amount: str):
 
 
 @app.route('/by_title/<title>')
-def get(title):
+def get(title: str):
     info = {}
     for art in data.values():
         if art["title"] == title:
@@ -49,7 +49,7 @@ def get(title):
         return get(title)
 
 @app.route("/by_uuid/<uuid>")
-def get_id(uuid):
+def get_id(uuid: str):
     art = data.get(uuid)
     if art != None:
         return art
