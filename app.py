@@ -43,7 +43,7 @@ def all_artis(amount: str):
     global data
     if not amount.isdigit():
         return Response(status="400")
-    artis = list(data.keys())
+    artis = list(data.values())
     return list(set(random.choices(artis,k=int(amount))))
 
 
