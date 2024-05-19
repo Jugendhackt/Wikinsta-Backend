@@ -1,9 +1,7 @@
 import difflib
 import random
-import time
 from flask import Flask
 import json
-import threading
 main_thread_running = True
 import thefuzz.fuzz as fuzz
 from articleExtractor import searchArticles
@@ -36,39 +34,21 @@ def get(art):
     if info != None:
         return data.get(art)
     else:
-        return f"Keine Info zum Thema: {art}"
+        search_wikipedia(art)
+        return get(art)
 
 
 def search_wikipedia(art: str):
     global data
-    response = searchArticles(art,"de")
+    response = searchArticles(art,"en")
     arti = response[0]
     title = arti["title"]
-    print(data)
 
     if data.get(title) == None:
-        data.update({title:{"id":arti["id"],"summary":arti["summary"]}})
+        data.update({title:arti})
     json.dump(data,open("data.json","w"))
     return arti["summary"]
 
-import keyboard
-def exit_full():
-    global main_thread_running
-    main_thread_running = False
-    exit()
-keyboard.add_hotkey('ctrl + c', exit_full)
-def update():
-    global data
-    while True:
-        data = json.load(open("data.json", "r"))
-        print("Re-cached database")
-        for i in range(100):
-            if not main_thread_running:
-                return
-            time.sleep(10/100)
 
 if __name__ == "__main__":
-    p = threading.Thread(target=update)
-    print(f'Dummy request: {search_wikipedia("Wasser")}')
-    p.start()
     app.run(host='0.0.0.0', port=5000)
