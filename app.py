@@ -73,11 +73,9 @@ def search_wikipedia(name: str):
     response = searchArticles(name, "de")
     art = response[0]
     not_found = True
-    print("resp",response)
     for art2 in data.values():
         if art["title"] == art2["title"]:
             not_found = False
-    print("resp",response)
     if not_found:
         add_article(art)
     return art
