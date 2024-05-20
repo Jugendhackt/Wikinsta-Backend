@@ -55,8 +55,10 @@ def getImage(search_query='Never gonna give you up', language_code='en'):
             imgs.append('noimg')
 
     img = imgs[0]
+
     if img != 'noimg':
-        if getLicense(img, language_code).startswith("CC"):
+        license = getLicense(img, language_code)
+        if license.startswith("cc") or license == 'public domain':
             return {'img': img, 'license': getLicense(img, language_code), 'artist': getArtist(img, language_code)}
 
     return None
@@ -70,9 +72,13 @@ def getLicense(imgURL, language_code='en'):
     response = requests.get(url)
     jsonResponse = response.json()
 
-    shortLicense = jsonResponse['query']['pages']['-1']['imageinfo'][0]['extmetadata']['LicenseShortName']['value']
+    # query > pages > -1 > imageinfo > [0] > extmetadata > LicenseShortName > value
+    shortLicenses = []
 
-    return shortLicense
+    for id, value in jsonResponse['query']['pages'].items():
+        shortLicenses.append(value['imageinfo'][0]['extmetadata']['LicenseShortName']['value'])
+
+    return shortLicenses[0].lower()
 
 # Returns the Artist of the given Image
 
