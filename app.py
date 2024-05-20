@@ -1,6 +1,7 @@
 import difflib
 import random
 import uuid
+import sys
 
 import textdistance
 from flask import Flask, Response
@@ -114,4 +115,20 @@ def find(iterable, predicate):
 
 
 if __name__ == "__main__":
-    app.run(host=IP, port=PORT)
+    with open("./content/tabelle_musik.csv", "r") as f:
+        music_lines = f.read().splitlines()
+
+    try:
+        mode = sys.argv[1]
+    except:
+        mode = "server"
+
+    match mode:
+        case "server":
+            app.run(host=IP, port=PORT)
+        case "data":
+            for line in music_lines:
+                title = line.split(',')[0]
+                print(f"Adding {title}")
+                search_wikipedia(title)
+
