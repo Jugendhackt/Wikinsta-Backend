@@ -17,6 +17,10 @@ import requests
 
 # Function to get some informations about a Wikipedia article.
 
+def getRandomArticle(language_code):
+    response = requests.get(f"https://{language_code}.wikipedia.org/wiki/Special:Random")
+    return searchArticles(response.url.split('/')[-1], language_code)
+
 def searchArticles(search_query='Never gonna give you up', language_code='en'):
     url = f'https://{language_code}.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles={search_query}'
     response = requests.get(url)
@@ -83,10 +87,13 @@ def getLicense(imgURL, language_code='en'):
 # Returns the Artist of the given Image
 
 def getArtist(imgURL, language_code='en'):
-    imgName = imgURL.split('/')[-1]
+    try:
+        imgName = imgURL.split('/')[-1]
 
-    url = f'https://{language_code}.wikipedia.org/w/api.php?action=query&prop=imageinfo&iiprop=extmetadata&format=json&titles=File%3a{imgName}'
-    response = requests.get(url)
-    jsonResponse = response.json()
+        url = f'https://{language_code}.wikipedia.org/w/api.php?action=query&prop=imageinfo&iiprop=extmetadata&format=json&titles=File%3a{imgName}'
+        response = requests.get(url)
+        jsonResponse = response.json()
 
-    return jsonResponse['query']['pages']['-1']['imageinfo'][0]['extmetadata']['Artist']['value']
+        return jsonResponse['query']['pages']['-1']['imageinfo'][0]['extmetadata']['Artist']['value']
+    except KeyError:
+        return 'No Artist found'
