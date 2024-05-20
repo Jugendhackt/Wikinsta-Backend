@@ -71,13 +71,21 @@ def create_title(title: str):
 
 # Gets an article vie UUID from the db
 @app.route("/by_uuid/<uuid>")
-def get_id(uuid: str):
+def get_uuid(uuid: str):
     art = data.get(uuid)
     if art != None:
         return art
     else:
         return Response(status="404")
 
+# Gets an article via normal id from the db
+@app.route("/by_id/<id>")
+def get_id(id: str):
+    article = find(list(data.values()), lambda art: art["id"] == id)
+    if not article is None:
+        return article
+    else:
+        return Response(status="404")
 
 # Searches wikipedia for an article,
 # which it then puts into the db
@@ -94,6 +102,15 @@ def search_wikipedia(name: str):
     if not_found:
         add_article(art)
     return art
+
+def find(iterable, predicate):
+    if len(iterable) == 0:
+        return None
+
+    if predicate(iterable[0]):
+        return iterable[0]
+
+    return find(iterable[1:], predicate)
 
 
 if __name__ == "__main__":
